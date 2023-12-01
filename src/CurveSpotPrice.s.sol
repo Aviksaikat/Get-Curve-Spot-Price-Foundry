@@ -1,0 +1,65 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.22;
+
+import "./interfaces/IMetaPoolRegistry.sol";
+import "./interfaces/ICurvePool.sol";
+
+// interface IMetaPoolRegistry {
+//     function find_pool_for_coins(address _from, address _to) external view returns (address);
+// }
+
+// interface ICurvePool {
+//     function get_dy(int128 i, int128 j, uint256 dx) external view returns (uint256);
+//     function coins(uint256 idx) external view returns (address);
+// }
+
+contract CurveSpotPrice {
+    // address public metaPoolRegistryContractAddress;
+    address public poolAddress;
+
+    IMetaPoolRegistry private metaPoolRegistryContract;
+    ICurvePool private poolContract;
+
+    constructor() payable {
+        // metaPoolRegistryContract = IMetaPoolRegistry(_addr);
+    }
+
+    function curveMetaPool(address pool, address tokenIn, address tokenOut, uint256 amount) public returns (uint256) {
+        int128 i = 0;
+        int128 j = 0;
+        uint128 coinIdx = 0;
+        poolContract = ICurvePool(pool);
+
+        while (i == i) {
+            address coin = poolContract.coins(coinIdx);
+
+            if (coin == tokenIn) {
+                i = int128(coinIdx);
+            } else if (coin == tokenOut) {
+                j = int128(coinIdx);
+            }
+
+            if (i != j) {
+                break;
+            }
+            coinIdx++;
+        }
+        uint256 amountsOut = poolContract.get_dy(i, j, amount);
+
+        return amountsOut;
+    }
+
+    function getSpotPrice(address RegistryAddr, address[] calldata tokens, uint256 realAmountIn)
+        public
+        returns (uint256)
+    {
+        metaPoolRegistryContract = IMetaPoolRegistry(RegistryAddr);
+        poolAddress = metaPoolRegistryContract.find_pool_for_coins(tokens[0], tokens[1]);
+
+        require(poolAddress != address(0), "No pools found");
+
+        uint256 amountsOut = curveMetaPool(poolAddress, tokens[0], tokens[1], realAmountIn);
+
+        return amountsOut;
+    }
+}
