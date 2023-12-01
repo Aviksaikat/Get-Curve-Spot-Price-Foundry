@@ -19,10 +19,10 @@ contract GetPrice is Test {
 
     function setUp() public {
         mainnetFork = vm.createFork(MAINNET_RPC_URL);
-        spotPriceContract = new CurveSpotPrice();
+        spotPriceContract = new CurveSpotPrice(metaPoolRegistryContractAddress);
     }
 
-    function test_get_spot_price() public {
+    function testGetSpotPrice() public {
         vm.selectFork(mainnetFork);
         vm.startPrank(sender);
 
@@ -33,7 +33,7 @@ contract GetPrice is Test {
         tokens[0] = DAI_ADDRESS;
         tokens[1] = USDC_ADDRESS;
 
-        uint256 amountsOut = spotPriceContract.getSpotPrice(metaPoolRegistryContractAddress, tokens, amount);
+        uint256 amountsOut = spotPriceContract.getSpotPrice(tokens, amount);
         console.log("Pool Found %s", spotPriceContract.poolAddress());
         console.log(amountsOut);
 

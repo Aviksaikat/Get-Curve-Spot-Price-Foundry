@@ -20,11 +20,14 @@ contract CurveSpotPrice {
     IMetaPoolRegistry private metaPoolRegistryContract;
     ICurvePool private poolContract;
 
-    constructor() payable {
-        // metaPoolRegistryContract = IMetaPoolRegistry(_addr);
+    constructor(address _addr) payable {
+        metaPoolRegistryContract = IMetaPoolRegistry(_addr);
     }
 
-    function curveMetaPool(address pool, address tokenIn, address tokenOut, uint256 amount) public returns (uint256) {
+    function _curveMetaPool(address pool, address tokenIn, address tokenOut, uint256 amount)
+        internal
+        returns (uint256)
+    {
         int128 i = 0;
         int128 j = 0;
         uint128 coinIdx = 0;
@@ -49,16 +52,12 @@ contract CurveSpotPrice {
         return amountsOut;
     }
 
-    function getSpotPrice(address RegistryAddr, address[] calldata tokens, uint256 realAmountIn)
-        public
-        returns (uint256)
-    {
-        metaPoolRegistryContract = IMetaPoolRegistry(RegistryAddr);
+    function getSpotPrice(address[] calldata tokens, uint256 realAmountIn) external returns (uint256) {
         poolAddress = metaPoolRegistryContract.find_pool_for_coins(tokens[0], tokens[1]);
 
         require(poolAddress != address(0), "No pools found");
 
-        uint256 amountsOut = curveMetaPool(poolAddress, tokens[0], tokens[1], realAmountIn);
+        uint256 amountsOut = _curveMetaPool(poolAddress, tokens[0], tokens[1], realAmountIn);
 
         return amountsOut;
     }
