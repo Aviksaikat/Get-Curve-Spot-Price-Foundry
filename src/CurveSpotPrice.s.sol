@@ -3,15 +3,7 @@ pragma solidity ^0.8.22;
 
 import "./interfaces/IMetaPoolRegistry.sol";
 import "./interfaces/ICurvePool.sol";
-
-// interface IMetaPoolRegistry {
-//     function find_pool_for_coins(address _from, address _to) external view returns (address);
-// }
-
-// interface ICurvePool {
-//     function get_dy(int128 i, int128 j, uint256 dx) external view returns (uint256);
-//     function coins(uint256 idx) external view returns (address);
-// }
+import "forge-std/console.sol";
 
 contract CurveSpotPrice {
     // address public metaPoolRegistryContractAddress;
