@@ -12,7 +12,6 @@ import "src/interfaces/ICurvePool.sol";
 contract GetPrice is Test {
     CurveSpotPrice public spotPriceContract;
     uint256 mainnetFork;
-    string MAINNET_RPC_URL = vm.envString("WEB3_INFURA_RPC");
 
     address immutable metaPoolRegistryContractAddress = 0xF98B45FA17DE75FB1aD0e7aFD971b0ca00e379fC;
     address immutable DAI_ADDRESS = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
@@ -26,7 +25,7 @@ contract GetPrice is Test {
     ICurvePool private poolContract;
 
     function setUp() public {
-        mainnetFork = vm.createFork(MAINNET_RPC_URL);
+        mainnetFork = vm.createSelectFork("mainnet");
         // spotPriceContract = new CurveSpotPrice(metaPoolRegistryContractAddress);
     }
 
@@ -73,7 +72,6 @@ contract GetPrice is Test {
     }
 
     function testGetSpotPrice() public {
-        vm.selectFork(mainnetFork);
         vm.startPrank(sender);
 
         // 1 ETH
