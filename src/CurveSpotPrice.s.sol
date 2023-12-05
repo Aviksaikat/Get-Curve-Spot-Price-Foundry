@@ -6,7 +6,6 @@ import "./interfaces/ICurvePool.sol";
 import "forge-std/console.sol";
 
 contract CurveSpotPrice {
-    // address public metaPoolRegistryContractAddress;
     address public poolAddress;
 
     IMetaPoolRegistry private metaPoolRegistryContract;
@@ -25,10 +24,12 @@ contract CurveSpotPrice {
         uint128 coinIdx = 0;
         poolContract = ICurvePool(pool);
 
-        while (i == i) {
+        while (true) {
             address coin = poolContract.coins(coinIdx);
 
-            if (coin == tokenIn) {
+            if (coin == address(0)) {
+                break;
+            } else if (coin == tokenIn) {
                 i = int128(coinIdx);
             } else if (coin == tokenOut) {
                 j = int128(coinIdx);
@@ -39,12 +40,18 @@ contract CurveSpotPrice {
             }
             coinIdx++;
         }
+        require(i != j, "Both tokens must be in the pool");
+
         uint256 amountsOut = poolContract.get_dy(i, j, amount);
 
         return amountsOut;
     }
 
     function getSpotPrice(address[] calldata tokens, uint256 realAmountIn) external returns (uint256) {
+        require(tokens.length == 2, "Tokens array should have exactly 2 elements");
+        require(tokens[0] != address(0) && tokens[1] != address(0), "Tokens addresses should not be zero");
+        require(realAmountIn > 0, "Amount should be greater than 0");
+
         poolAddress = metaPoolRegistryContract.find_pool_for_coins(tokens[0], tokens[1]);
 
         require(poolAddress != address(0), "No pools found");
